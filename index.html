@@ -35,7 +35,7 @@
     <meta property="og:description" content="기술, 그리고 팀 투데잇의 모든 것을 공유하는 팀블로그 입니다." />
     <meta property="og:url" content="http://localhost:4000/" />
     <meta property="og:image" content="http://localhost:4000/assets/images/blog-cover.jpg" />
-    <meta property="article:publisher" content="https://www.facebook.com/todait" />
+    <meta property="article:publisher" content="https://www.facebook.com/todaitmaker" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="팀 투데잇 기술블로그" />
     <meta name="twitter:description" content="기술, 그리고 팀 투데잇의 모든 것을 공유하는 팀블로그 입니다." />
@@ -118,7 +118,7 @@ into the {body} of the default.hbs template -->
     <div class="site-nav-right">
         <div class="social-links">
             
-                <a class="social-link social-link-fb" href="https://facebook.com/todait" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+                <a class="social-link social-link-fb" href="https://facebook.com/todaitmaker" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
 </a>
             
             
@@ -126,9 +126,6 @@ into the {body} of the default.hbs template -->
 </a>
             
         </div>
-        
-            <a class="subscribe-button" href="#subscribe">Subscribe</a>
-        
     </div>
 </nav>
 
@@ -144,38 +141,50 @@ into the {body} of the default.hbs template -->
             
     <article class="post-card home-template">
         
-            <a class="post-card-image-link" href="/welcome">
-                <div class="post-card-image" style="background-image: url(/assets/images/welcome.jpg)"></div>
+            <a class="post-card-image-link" href="/image-resizing-service">
+                <div class="post-card-image" style="background-image: url(/assets/images/advanced.jpg)"></div>
             </a>
         
         <div class="post-card-content">
-            <a class="post-card-content-link" href="/welcome">
+            <a class="post-card-content-link" href="/image-resizing-service">
                 <header class="post-card-header">
                     
                         
                             
-                                <span class="post-card-tags">Getting started</span>
+                               <span class="post-card-tags">Aws lambda</span>
+                            
+                        
+                            
+                               <span class="post-card-tags">Flask</span>
+                            
+                        
+                            
+                               <span class="post-card-tags">Zappa</span>
+                            
+                        
+                            
+                                <span class="post-card-tags">Serverless</span>
                             
                         
                     
 
-                    <h2 class="post-card-title">Welcome to Ghost</h2>
+                    <h2 class="post-card-title">하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기</h2>
                 </header>
                 <section class="post-card-excerpt">
-                    <p>Hey! Welcome to Ghost, it’s great to have you :) We know that first impressions are important, so we’ve populated your new site with some initial Getting Started posts that will help you</p>
+                    <p>최근 투데잇 개발팀은 투데잇 모바일 어플리케이션을 위한 이미지 리사이징 서비스를 구축했습니다. Flask와 Wand(ImageMagick)를 사용해 서버 어플리케이션을 구현했으며 Zappa를 사용해 Lambda로 배포했습니다. CloudFront를 사용해 CDN까지 구성하여 모바일 어플리케이션에서 이미지 리소스를 로드하는 속도와 효율을 기존에</p>
                 </section>
             </a>
             <footer class="post-card-meta">
                 
                     
+                
+                    
                         
-                        <img class="author-profile-image" src="/assets/images/ghost.png" alt="Ghost" />
+                        <img class="author-profile-image" src="/assets/images/ryan.jpg" alt="Ryan Yoo" />
                         
                         <span class="post-card-author">
-                            <a href="/author/ghost/">Ghost</a>
+                            <a href="/author/ryan.yoo/">Ryan Yoo</a>
                         </span>
-                    
-                
                     
                 
                     
@@ -211,7 +220,7 @@ into the {body} of the default.hbs template -->
                     <a href="https://github.com/jekyller/jasper2" target="_blank" rel="noopener">Jasper2</a></section>
                 <nav class="site-footer-nav">
                     <a href="/">Latest Posts</a>
-                    <a href="https://facebook.com/todait" target="_blank" rel="noopener">Facebook</a>
+                    <a href="https://facebook.com/todaitmaker" target="_blank" rel="noopener">Facebook</a>
                     <a href="https://twitter.com/todait_" target="_blank" rel="noopener">Twitter</a>
                     <a href="https://ghost.org" target="_blank" rel="noopener">Ghost</a>
                 </nav>
@@ -219,30 +228,6 @@ into the {body} of the default.hbs template -->
         </footer>
 
     </div>
-
-    <!-- The big email subscribe modal content -->
-    
-        <div id="subscribe" class="subscribe-overlay">
-            <a class="subscribe-overlay-close" href="#"></a>
-            <div class="subscribe-overlay-content">
-                
-                    <img class="subscribe-overlay-logo" src="/assets/images/blog-icon.png" alt="팀 투데잇 기술블로그" />
-                
-                <h1 class="subscribe-overlay-title">Subscribe to 팀 투데잇 기술블로그</h1>
-                <p class="subscribe-overlay-description">Stay up to date! Get all the latest &amp; greatest posts delivered straight to your inbox</p>
-                <form method="post" action="/subscribe/" class="">
-    <input class="confirm" type="hidden" name="confirm"  /><input class="location" type="hidden" name="location"  /><input class="referrer" type="hidden" name="referrer"  />
-
-    <div class="form-group">
-        <input class="subscribe-email" type="email" name="email"  placeholder="youremail@example.com" />
-    </div>
-    <button class="" type="submit" disabled><span>Subscribe</span></button>
-    <script type="text/javascript">(function(g,h,o,s,t){h[o]('.location')[s]=h[o]('.location')[s] || g.location.href;h[o]('.referrer')[s]=h[o]('.referrer')[s] || h.referrer;})(window,document,'querySelector','value');</script>
-</form>
-
-            </div>
-        </div>
-    
 
     <!-- highlight.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.10.0/components/prism-abap.min.js"></script>
@@ -281,7 +266,7 @@ into the {body} of the default.hbs template -->
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-69281367-1', 'auto');
+  ga('create', 'UA-57213357-13', 'auto');
   ga('send', 'pageview');
 
  </script>

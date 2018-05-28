@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Base Meta -->
+    <!-- dynamically fixing the title for tag/author pages -->
+
+
+
+    <title>하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.edited.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/syntax.css" />
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+
+    <!-- This tag outputs SEO meta+structured data and other important settings -->
+    <meta name="description" content="기술, 그리고 팀 투데잇의 모든 것을 공유하는 팀블로그 입니다." />
+    <link rel="shortcut icon" href="http://localhost:4000/assets/images/favicon.png" type="image/png" />
+    <link rel="canonical" href="http://localhost:4000/image-resizing-service" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+
+     <!--title below is coming from _includes/dynamic_title-->
+    <meta property="og:site_name" content="팀 투데잇 기술블로그" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기" />
+    <meta property="og:description" content="최근 투데잇 개발팀은 투데잇 모바일 어플리케이션을 위한 이미지 리사이징 서비스를 구축했습니다. Flask와 Wand(ImageMagick)를 사용해 서버 어플리케이션을 구현했으며 Zappa를 사용해 Lambda로 배포했습니다. CloudFront를 사용해 CDN까지 구성하여 모바일 어플리케이션에서 이미지 리소스를 로드하는 속도와 효율을 기존에 비해 크게 향상 시켰습니다. Flask 어플리케이션 구현부터 모바일 어플리케이션에서 사용 가능한 프로덕션 배포까지 모든 과정을 완료하기까지 하루라는" />
+    <meta property="og:url" content="http://localhost:4000/image-resizing-service" />
+    <meta property="og:image" content="http://localhost:4000/assets/images/advanced.jpg" />
+    <meta property="article:publisher" content="https://www.facebook.com/todaitmaker" />
+    <meta property="article:author" content="https://www.facebook.com/todaitmaker" />
+    <meta property="article:published_time" content="2018-05-22T19:00:00+09:00" />
+    <meta property="article:modified_time" content="2018-05-22T19:00:00+09:00" />
+    <meta property="article:tag" content="Aws Lambda" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기" />
+    <meta name="twitter:description" content="최근 투데잇 개발팀은 투데잇 모바일 어플리케이션을 위한 이미지 리사이징 서비스를 구축했습니다. Flask와 Wand(ImageMagick)를 사용해 서버 어플리케이션을 구현했으며 Zappa를 사용해 Lambda로 배포했습니다. CloudFront를 사용해 CDN까지 구성하여 모바일 어플리케이션에서 이미지 리소스를 로드하는 속도와 효율을 기존에 비해 크게 향상 시켰습니다. Flask 어플리케이션 구현부터 모바일 어플리케이션에서 사용 가능한 프로덕션 배포까지 모든 과정을 완료하기까지 하루라는" />
+    <meta name="twitter:url" content="http://localhost:4000/" />
+    <meta name="twitter:image" content="http://localhost:4000/assets/images/advanced.jpg" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="팀 투데잇 기술블로그" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="Aws Lambda" />
+    <meta name="twitter:site" content="@todait_" />
+    <meta name="twitter:creator" content="@todait_" />
+    <meta property="og:image:width" content="1400" />
+    <meta property="og:image:height" content="933" />
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "publisher": {
+        "@type": "Organization",
+        "name": "팀 투데잇 기술블로그",
+        "logo": "http://localhost:4000/assets/images/blog-icon.png"
+    },
+    "url": "http://localhost:4000/image-resizing-service",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://localhost:4000/assets/images/advanced.jpg",
+        "width": 2000,
+        "height": 666
+    },
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://localhost:4000/image-resizing-service"
+    },
+    "description": "최근 투데잇 개발팀은 투데잇 모바일 어플리케이션을 위한 이미지 리사이징 서비스를 구축했습니다. Flask와 Wand(ImageMagick)를 사용해 서버 어플리케이션을 구현했으며 Zappa를 사용해 Lambda로 배포했습니다. CloudFront를 사용해 CDN까지 구성하여 모바일 어플리케이션에서 이미지 리소스를 로드하는 속도와 효율을 기존에 비해 크게 향상 시켰습니다. Flask 어플리케이션 구현부터 모바일 어플리케이션에서 사용 가능한 프로덕션 배포까지 모든 과정을 완료하기까지 하루라는"
+}
+    </script>
+
+    <!-- <script type="text/javascript" src="https://demo.ghost.io/public/ghost-sdk.min.js?v=724281a32e"></script>
+    <script type="text/javascript">
+    ghost.init({
+    	clientId: "ghost-frontend",
+    	clientSecret: "f84a07a72b17"
+    });
+    </script> -->
+
+    <meta name="generator" content="Jekyll 3.6.2" />
+    <link rel="alternate" type="application/rss+xml" title="하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기" href="/feed.xml" />
+
+
+</head>
+<body class="post-template">
+
+    <div class="site-wrapper">
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+
+<!-- The tag above means: insert everything in this file
+into the {body} of the default.hbs template -->
+
+<header class="site-header outer">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+        
+            
+                <a class="site-nav-logo" href="/"><img src="/assets/images/blog-icon.png" alt="팀 투데잇 기술블로그" /></a>
+            
+        
+        
+            <ul class="nav" role="menu">
+    <li class="nav-home" role="menuitem"><a href="/">Home</a></li>
+    <li class="nav-about" role="menuitem"><a href="/about/">About</a></li>
+</ul>
+
+        
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+            
+                <a class="social-link social-link-fb" href="https://facebook.com/todaitmaker" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+</a>
+            
+            
+                <a class="social-link social-link-tw" href="https://twitter.com/todait_" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+</a>
+            
+        </div>
+    </div>
+</nav>
+
+    </div>
+</header>
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+
+        <article class="post-full post tag-getting-started ">
+
+            <header class="post-full-header">
+                <section class="post-full-meta">
+                    <time class="post-full-meta-date" datetime="22 May 2018">22 May 2018</time>
+                    
+                        <span class="date-divider">/</span>
+                        
+                            
+                               <a href='/tag/aws-lambda/'>AWS LAMBDA</a>,
+                            
+                        
+                            
+                               <a href='/tag/flask/'>FLASK</a>,
+                            
+                        
+                            
+                               <a href='/tag/zappa/'>ZAPPA</a>,
+                            
+                        
+                            
+                               <a href='/tag/serverless/'>SERVERLESS</a>
+                            
+                        
+                    
+                </section>
+                <h1 class="post-full-title">하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기</h1>
+            </header>
+
+            
+            <figure class="post-full-image" style="background-image: url(/assets/images/advanced.jpg)">
+            </figure>
+            
+
+            <section class="post-full-content">
+                <div class="kg-card-markdown">
+                    <p>최근 투데잇 개발팀은 투데잇 모바일 어플리케이션을 위한 이미지 리사이징 서비스를 구축했습니다.
+Flask와 Wand(ImageMagick)를 사용해 서버 어플리케이션을 구현했으며 Zappa를 사용해 Lambda로 배포했습니다.
+CloudFront를 사용해 CDN까지 구성하여 모바일 어플리케이션에서 이미지 리소스를 로드하는 속도와 효율을 기존에 비해 크게 향상 시켰습니다.
+Flask 어플리케이션 구현부터 모바일 어플리케이션에서 사용 가능한 프로덕션 배포까지 모든 과정을 완료하기까지 하루라는 시간이 걸렸습니다.
+이번 포스팅에서는 기존 투데잇의 이미지 로드 방식의 문제점과 그 문제를 어떻게 하루만에 개선했는지 공유하려고 합니다.</p>
+
+<h1 id="기존-투데잇의-문제점">기존 투데잇의 문제점</h1>
+
+<p>초창기 투데잇 모바일 어플리케이션에서는 이미지의 사용 빈도가 낮았습니다.
+애초에 이미지가 들어가는 UI 요소가 프로필 이미지, 메인 화면의 배경 이미지, 스톱워치 화면의 배경 이미지로 많지 않았고 그 마저도 다른 사용자와 공유되는 되지 않고 자신만 볼 수 있는 UI 요소였습니다.
+따라서 초기 투데잇을 개발할 당시에는 이미지 파일을 최대한 간단하게 처리했습니다.</p>
+
+<p><img src="/assets/images/2018-05-22-image-resizing-service/previous_images.png" alt="이전 이미지" /></p>
+
+<p>사용자가 모바일 어플리케이션에서 프로필 이미지, 메인 화면의 배경 이미지, 스톱워치 화면의 배경 이미지를 설정할 때 로컬에 원본 이미지 파일을 따로 저장해 두고, 도쿄 리전에 있는 S3 버킷에 직접 이미지를 업로드하도록 처리했습니다.
+대부분의 경우에는 로컬에 캐싱된 이미지를 직접 로드해서 쓰기 때문에 이미지 로드 속도에 크게 문제가 되지 않았고, 로컬에 저장되는 이미지 개수도 많지 않았기 때문에 용량 문제도 없었습니다.
+새로운 디바이스에 로그인을 하거나 어플리케이션을 재설치했을 때는 도쿄 리전에 있는 S3 버킷으로 부터 원본 이미지를 직접 다운로드해야하기 때문에 이미지 로드 속도가 느릴 수 밖에 없습니다.
+하지만 한 번 다운로드한 후에는 로컬에 이미지 파일을 캐싱해두고 캐싱한 파일을 사용하기 때문에 사용자가 불편함을 인지할 만큼 큰 문제는 없었습니다.</p>
+
+<p><img src="/assets/images/2018-05-22-image-resizing-service/group_images.png" alt="그룹 이미지" /></p>
+
+<p>문제는 유료 상품으로 그룹 기능이 출시되고 그룹 기능을 이용하는 사용자들이 늘어난 후에 생겼습니다.
+다른 사람과 함께 공부하는 그룹 기능의 특성상 이미지가 들어가는 UI 요소가 많아졌습니다.
+그룹 상태 화면과 그룹 피드에 들어가는 프로필 이미지, 기상인증 이미지, 공지 및 게시글에 첨부된 이미지 등 다양한 이미지를 반복적으로 로드하는 경우가 늘어났습니다.
+하지만 그룹 기능 내에서 보여지는 이미지도 기존과 같이 원본 이미지를 도쿄 리전의 S3 버킷에서 직접 다운로드해 보여주는 방식으로 처리했기 때문에 다음과 같은 주요한 문제가 발생했습니다.</p>
+
+<ul>
+  <li>사용자가 답답함을 느낄 정도로 이미지 로드 속도가 느리다.</li>
+  <li>종종 이미지를 정상적으로 다운로드 받지 못해 이미지가 잘려 보인다.</li>
+  <li>모바일 디바이스에 이미지 파일을 캐싱한 후 해당 파일을 삭제하지 않아 어플리케이션 용량이 계속해서 증가한다.</li>
+  <li>모바일 디바이스에 용량이 부족한 경우 이미지 다운로드에 실패하고 이미지가 뜨지 않는다.</li>
+</ul>
+
+<p>다수의 이미지를 실제 필요한 사이즈와 상관없이 불필요하게 큰 사이즈로 다운로드하고, 이미지 파일을 로컬에 저장한 후 더 이상 사용하지 않는 파일을 삭제하지 않았던 것이 문제의 가장 큰 원인이었습니다.
+도쿄 리전의 S3에서 이미지 파일을 다운로드 받는 것도 다운로드 속도에 영향을 주었습니다.</p>
+
+<h1 id="스펙">스펙</h1>
+
+<p>기존 투데잇의 이미지 로드 문제를 근본적으로 해결하기 위해 이미지 리사이징 서비스가 필요하다고 판단하였습니다.
+이미지 리사이징 서비스의 기능으로 크게 3가지가 필요했습니다.</p>
+
+<ul>
+  <li>모바일 어플리케이션에서 원하는 사이즈의 이미지를 URL 기반으로 자유롭게 요청할 수 있어야한다.</li>
+  <li>한 번 리사이즈한 이미지는 S3에 저장하고, 이후 요청에서는 S3에 저장된 이미지 파일을 반환해 같은 사이즈에 대해 중복해서 리사이즈하는 경우가 없어야한다.</li>
+  <li>CDN에 이미지를 캐싱해야한다.</li>
+</ul>
+
+<p>이미지가 나타나는 뷰의 크기와 모바일 디바이스의 해상도에 따라 최적의 이미지 크기가 달라지기 때문에 필요한 이미지 크기를 파라미터 설정을 통해 요청하는 기능은 필수입니다.
+또한 URL을 기반으로 이미지를 로드할 수 있다면 모바일 어플리케이션에서 <a href="https://github.com/bumptech/glide">Glide</a> (Android), <a href="https://github.com/Alamofire/AlamofireImage">AlamofireImage</a> (iOS)와 같은 이미지 처리 라이브러리를 사용해 이미지 다운로드부터 파일 캐싱, 메모리 캐싱 등의 처리를 손쉽게 구현할 수 있습니다.
+다음과 같은 형태로 이미지를 요청할 수 있습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://domain.com/images/image_file_name.jpg?criterion=width&amp;size=200
+</code></pre></div></div>
+
+<p>이미지 리사이징 서비스에서 가장 오래 걸리는 작업은 아마도 이미지 크기를 바꾸는 리사이즈 작업일 것입니다.
+따라서 한 번 리사이즈한 이미지는 S3에 저장해 같은 사이즈에 대해서 반복해서 리사이즈하지 않도록 처리합니다.
+그러면 이후 같은 사이즈에 대한 요청의 지연 시간(latency)을 낮출 수 있습니다.</p>
+
+<p>투데잇은 AWS 도쿄 리전을 사용하고 있습니다.
+이미지를 저장하고 있는 S3 버킷 또한 도쿄 리전에 존재하고 Lambda 또한 도쿄 리전에 구성해야합니다.
+따라서 사용자에게 조금이라도 더 빠르게 이미지를 제공하기 위해 CDN도 구성해야합니다.</p>
+
+<h1 id="구현">구현</h1>
+
+<p><img src="/assets/images/2018-05-22-image-resizing-service/image_resizing_service_architecture.png" alt="아키텍처" /></p>
+
+<h3 id="flask">Flask</h3>
+
+<p>Python과 같은 경우 이미 서비스 데이터 분석에 사용하고 있었기 때문에 익숙한 언어였고, 회사에서 다른 프로젝트를 진행하면서 Flask 기반으로 백앤드를 구현한 경험도 있었습니다.
+또 아래 코드와 같이 필요한 기능 이외에 불필요한 설정을 할 필요가 없다는 점에서 Flask는 당장 다양한 기능이 굳이 필요없는 이미지 리사이징 서비스 구현에 적합했습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">app</span> <span class="o">=</span> <span class="n">FlaskAPI</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">instance_relative_config</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">app_config</span><span class="p">)</span>
+<span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">'/images/&lt;string:image_name&gt;'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">'GET'</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_resized_image</span><span class="p">(</span><span class="n">image_name</span><span class="p">):</span>
+    <span class="c"># ...</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">'success'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>무엇보다 Python 기반의 Flask를 선택한 가장 큰 이유는 Zappa를 사용할 수 있다는 점이었습니다.
+Zappa를 사용하면 배포를 위한 아주 간단한 설정만으로 로컬에서 구현한 Flask 어플리케이션을 AWS Lambda로 빠르게 배포할 수 있습니다.
+Zappa에 대한 자세한 내용은 아래에서 다루도록 하겠습니다.</p>
+
+<h3 id="wand-imagemagick">Wand (ImageMagick)</h3>
+
+<p>이미지 처리 라이브러리로는 Wand를 선택했습니다.
+처음에는 <a href="http://engineering.vcnc.co.kr/2016/05/ondemand-image-resizing/">비트윈의 사례</a>와 <a href="http://nrise.github.io/2016/07/01/skia/">모씨의 사례</a>를 보고 ImageMagick 보다 성능이 좋은 Skia를 사용하고자 했습니다.
+하지만 Skia와 같은 경우 최근까지 활발하게 유지보수되고 쉽게 가져와서 사용할만한 Python 바인딩 라이브러리가 마땅히 없었기에 Skia를 사용하기 위해서는 저희가 직접 Python 바인딩을 구현해야하는 상황이었습니다.
+저희는 이미지 리사이징 서비스를 구축하기 위해 최대 2일 정도의 시간을 쓸 수 밖에 없는 상황이었고, 모씨에서 직접 개발하는데 일주일이 걸렸다고 하였기에 성능은 빠르게 포기하고 가장 쉽고 빠르게 연동할 수 있는 Wand (ImageMagick)를 선택하게 되었습니다.
+실제로 Pipenv를 통해 Wand를 Flask 프로젝트에 설치하고, 로컬 환경에 ImageMagick을 설치하기만 하면 아래 코드와 같이 바로 이미지를 리사이즈할 수 있었습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="n">Image</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="n">origin_image_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">image</span><span class="p">:</span>
+    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">measure_image_size</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+    <span class="c"># ...</span>
+</code></pre></div></div>
+
+<p>Wand와 같은 경우 처음 로컬 환경에 설치할 때 조금 애를 먹었습니다.
+Wand에서 아직 최신 버전의 ImageMagick 7을 지원하지 않는데 이 사실을 몰라 Wand의 가이드 문서를 따라 <code class="highlighter-rouge">brew install imagemagick</code> 명령으로 ImageMagick 7을 설치했고, 아래와 같은 에러와 함께 Flask 어플리케이션을 실행할 수 없었습니다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ImportError: MagickWand shared library not found.
+You probably had not installed ImageMagick library.
+Try to install:
+  brew install freetype imagemagick
+</code></pre></div></div>
+
+<p>Wand가 현재(2018년 5월) ImageMagick 6까지만 지원하기 때문에 아래 명령어로 ImageMagick 6 버전을 설치해주어야 했습니다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew install imagemagick@6
+brew link imagemagick@6 <span class="nt">--force</span>
+</code></pre></div></div>
+
+<p>앞서 이야기했듯이 전체 서비스에서 이미지 크기를 바꾸는 리사이즈 작업이 가장 성능을 잡아먹고, 오래 걸리는 작업인 만큼 추후 Wand (ImageMagick) 보다 빠른 라이브러리로 대체할 계획입니다.
+대체할 라이브러리로는 위에서 언급한 Skia나 Pillow-SIMD를 고려하고 있습니다.</p>
+
+<h3 id="zappa-server-less-python-on-aws-lambda">Zappa (Server-less Python on AWS Lambda)</h3>
+
+<p>이제 Flask 어플리케이션을 로컬 환경에서 개발 및 테스트를 완료했으니 모바일 어플리케이션에서 사용 가능하도록 배포해야 합니다.
+저희는 아래의 기준에 따라 Zappa를 사용해 AWS Lambda로 배포하기로 결정했습니다.</p>
+
+<ul>
+  <li>최대 2일 이라는 한정된 시간 안에 프로덕션 배포 작업을 마무리할 수 있어야한다.</li>
+  <li>기존 AWS EC2에서 돌아가고 있는 API 서버에 영향을 주지 않아야 한다.</li>
+  <li>가능하면 최대한 저렴한 비용(경제적인 측면, 관리의 측면)으로 운영할 수 있어야한다.</li>
+</ul>
+
+<p>Zappa는 배포 작업을 정말 간단하게 만들어 주고, AWS Lambda는 기존 서버와 완전히 독립적으로 구성되고 저렴한 비용으로 서비스를 운영할 수 있게 해줍니다.</p>
+
+<p>Zappa는 기존 Django나 Flask와 같은 Python 웹 어플리케이션을 매우 간단하게 AWS Lambda 위에서 동작하는 서버리스 Python 어플리케이션으로 배포해주는 도구입니다.
+실제로 Zappa 패키지를 설치하고, <code class="highlighter-rouge">zappa_settings.json</code> 파일을 설정하고, 배포 명령어를 치는 것만으로 프로덕션 환경으로 배포할 수 있습니다.
+Lambda, API Gateway, CloudFormation, IAM Role, Cloudwatch 설정까지 Zappa에서 모두 자동으로 해줍니다.
+물론 <code class="highlighter-rouge">zappa_settings.json</code> 파일을 통해 직접 설정할 수도 있습니다.</p>
+
+<p><code class="highlighter-rouge">pipenv install zappa</code> 명령어로 Flask 프로젝트 환경에 Zappa 패키지를 설치합니다.
+그리고 난 다음 <code class="highlighter-rouge">zappa init</code> 명령어를 실행하거나 다음과 같이 <code class="highlighter-rouge">zappa_settings.json</code> 파일을 직접 추가해 배포에 필요한 설정을 합니다.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"production"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"project_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"image-resizing-flask"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"aws_region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ap-northeast-1"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"s3_bucket"</span><span class="p">:</span><span class="w"> </span><span class="s2">"production-bucket"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"runtime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"python3.6"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"aws_environment_variables"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"CONFIG_NAME"</span><span class="p">:</span><span class="w"> </span><span class="s2">"production"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"FLASK_APP"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run.py"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"memory_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">512</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"timeout_seconds"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"vpc_config"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"SubnetIds"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"subnet-12345678"</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"SecurityGroupIds"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"sg-12345678"</span><span class="p">]</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"app_function"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run.app"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"exclude"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"*.gz"</span><span class="p">,</span><span class="w"> </span><span class="s2">"*.rar"</span><span class="p">,</span><span class="w"> </span><span class="s2">".git"</span><span class="p">,</span><span class="w"> </span><span class="s2">".gitignore"</span><span class="p">],</span><span class="w">
+        </span><span class="s2">"keep_warm"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p><code class="highlighter-rouge">zappa_settings.json</code> 파일에 배포에 필요한 설정을 끝내고 나면 <code class="highlighter-rouge">zappa deploy production</code> 명령을 통해 Flask 어플리케이션을 Lambda로 배포할 수 있습니다.
+처음 배포한 이후의 수정 사항은 <code class="highlighter-rouge">zappa update production</code> 명령을 통해 다운 타임 없이 배포할 수 있습니다.</p>
+
+<p>한 가지 더 편했던 점은 배포할 때 precompiled C-extension을 Zappa가 자동으로 가져와 주기 때문에 저희가 따로 설정할 필요가 없었다는 점입니다.
+대표적으로 Wand 라이브러리의 ImageMagick에 대한 의존성을 가지고 있습니다.
+로컬 개발 환경에서는 ImageMagick를 직접 설치했지만 배포 시에는 따로 설치하거나 하지 않았습니다.</p>
+
+<p>AWS Lambda는 메모리 크기를 설정할 수 있습니다.
+AWS의 <a href="https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/resource-model.html">개발자 안내서</a>에는 설정한 메모리 크기 비례해 CPU 성능과 요금이 달라진다 라고만 나와 있어 처음에는 메모리 값을 어느 정도로 설정해야 적정 성능과 비용이 나올지 감이 잘 안잡혔습니다.
+관련해서 조사를 하던 중 <a href="http://blog.dable.io/220928186717">메모리 값에 따라 CPU 성능과 요금이 어떻게 변하는지에 대해 실험한 글</a>을 찾았습니다.
+이 글의 실험에 따르면 메모리 설정값에 따라 실제 연산 속도는 지수적 감쇠 관계를 보이고, 비용과 같은 경우는 메모리 설정값과 크게 상관없이 비용이 거의 같다고 합니다.
+실제 이미지 리사이즈 로직을 테스트해본 결과 메모리 설정값이 대략 1500MB 이상으로 가게 되면 연산 속도에 극적인 변화는 느껴지지 않아 메모리 크기를 2048MB 결정했습니다.</p>
+
+<p>AWS Lamda에서 VPC의 Private Subnet에 있는 RDS 인스턴스에 접속하기 위해서는 AWS Lamda가 같은 VPC와 Private Subnet에 존재해야 합니다.
+여기서 주의할 점은 Lamda에 VPC를 설정하게 되면 인터넷 엑세스 권한을 상실하기 때문에 꼭 Lambda에 설정된 Security Group의 아웃바운드 연결을 허용하고, Private Subnet이 외부 인터넷에 엑세스할 수 있도록 VPC에 NAT Gateway를 설정해야 한다는 점입니다.</p>
+
+<h3 id="cloudfront">CloudFront</h3>
+
+<p>S3 버킷과 Lambda 모두 도쿄 리전에 존재합니다.
+따라서 CloudFront를 통해 한국에 존재하는 엣지 로케이션에 이미지를 캐싱하게 되면 추가적인 성능 개선을 기대할 수 있습니다.
+Origin은 <code class="highlighter-rouge">https://abcdefghij.execute-api.ap-northeast-1.amazonaws.com/production</code> 과 같은 API Gateway의 주소로 설정합니다.</p>
+
+<p>원본이 같은 이미지라도 URL 쿼리에 이미지 사이즈를 어떻게 설정하는지에 따라서 각각 다른 리소스가 되고, 각각 다른 파일로 엣지 로케이션에 캐싱되어야 합니다.
+따라서 아래와 같이 <code class="highlighter-rouge">Query String Forwarding and Caching</code> 설정을 <code class="highlighter-rouge">Forward all, cache based on whitelist</code> 또는 <code class="highlighter-rouge">Forward all, cache based on all</code> 로 해야합니다.</p>
+
+<p><img src="/assets/images/2018-05-22-image-resizing-service/cloud_front_setting.png" alt="CloudFront 설정" /></p>
+
+<h1 id="결과">결과</h1>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mWFb_dRghSQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/KkssUyiBaSk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
+
+<p>새로 구현한 이미지 리사이징 서비스를 실제 모바일에 적용한 결과 기대한 만큼의 이미지 로드 속도 개선 효과를 볼 수 있었고, 사용자가 체감할 만큼의 속도 차이를 보여줬습니다.</p>
+
+<p><img src="/assets/images/2018-05-22-image-resizing-service/performance_chart.png" alt="성능" /></p>
+
+<p>위 차트는 1600 * 1200 사이즈의 이미지를 160 * 120 사이즈로 리사이즈 하는 경우에 대해서 테스트한 결과입니다.
+각각 경우에 대해서 50번 요청한 지연 시간의 평균입니다.
+S3에서 바로 반환하는 경우는 그래도 양호한 편이지만 리사이즈한 후에 반환하는 경우는 때에 따라서 600~700ms까지 느려질 때도 있었습니다.</p>
+
+<h1 id="정리">정리</h1>
+
+<p>투데잇 개발팀은 Flask, Wand, Zappa, AWS Lambda, CloudFront를 사용해 하루만에 이미지 리사이징 서비스를 개발, 배포까지 마무리했습니다.
+짧은 시간 안에 작업을 마무리해야 했기에 앞으로 이미지 리사이즈 성능, 원본 이미지 저장 효율, CDN Cache Hit Ratio 등 개선할 사항이 많이 있습니다.
+하지만 적은 시간을 투자해 빠르게 기존의 문제점을 개선하고 안정적으로 서비스를 배포했다는 점에서 서버리스 아키텍처의 장점을 실감할 수 있었습니다.
+서버리스 아키텍처가 모든 곳에 적합하거나 이점을 가져다 주지는 않겠지만 적재적소에 잘 활용하면 경제적인 비용 뿐만 아니라 서비스를 개발하고 운영하는 비용도 획기적으로 줄일 수 있을 것입니다.
+특히 시간이 생명인 스타트업에서 서버리스 아키텍처는 더욱 매력적으로 다가올 것입니다.</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li>당근 마켓 - <a href="https://medium.com/n42-corp/aws-lambda를-이용한-이미지-썸네일-생성-개발-후기-acc278d49980">AWS Lambda를 이용한 이미지 썸네일 생성 개발 후기</a></li>
+  <li>비트윈 - <a href="http://engineering.vcnc.co.kr/2016/05/ondemand-image-resizing/">서버 비용을 70%나 줄인 온디맨드 리사이징 이야기</a></li>
+  <li>모씨 - <a href="http://nrise.github.io/2016/07/01/skia/">Skia Python 적용기</a></li>
+  <li>로켓펀치 - <a href="https://blog.rocketpunch.com/2017/07/02/2-million-pv-with-300-krw/">300원에 200만뷰 소화하기 – 서버리스 아키텍처 AWS 람다(Lambda) 활용 사례</a></li>
+  <li>데이블 - <a href="https://www.theteams.kr/teams/385/post/64311">AWS Lambda에서 메모리 설정값과 CPU 파워의 관계</a></li>
+  <li><a href="http://blog.remotty.com/blog/2017/08/07/serverless-python-web-services-salpyeobogi/">Serverless Python Web Services - Zappa 살펴보기</a></li>
+</ul>
+
+                </div>
+            </section>
+
+            <footer class="post-full-footer">
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+                
+                    
+                
+                    
+                        <section class="author-card">
+                            
+                                <img class="author-profile-image" src="/assets/images/ryan.jpg" alt="ryan.yoo" />
+                            
+                            <section class="author-card-content">
+                                <h4 class="author-card-name"><a href="/author/ryan.yoo">Ryan Yoo</a></h4>
+                                
+                                    <p>투데잇의 공동 창업자이자 CTO입니다. 천상 개발자인 그는 투데잇에서 안드로이드 어플리케이션부터 iOS 어플리케이션, 백앤드까지 서비스 개발 전반을 개발 및 총괄하고 있습니다. Swfit와 Kotlin을 세상 좋아하며 소프트웨어 아키텍처에 관심이 많습니다.</p>
+                                
+                            </section>
+                        </section>
+                        <div class="post-full-footer-right">
+                            <a class="author-card-button" href="/author/ryan.yoo">Read More</a>
+                        </div>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                <!-- /author  -->
+            </footer>
+
+            <!-- If you use Disqus comments, just uncomment this block.
+            The only thing you need to change is "test-apkdzgmqhj" - which
+            should be replaced with your own Disqus site-id. -->
+            
+                <section class="post-full-comments">
+                    <div id="disqus_thread"></div>
+                    <script>
+                        var disqus_config = function () {
+                            this.page.url = 'http://localhost:4000/';
+                            this.page.identifier = '팀 투데잇 기술블로그';
+                        };
+                        (function() {
+                            var d = document, s = d.createElement('script');
+                            s.src = 'https://teamtodait.disqus.com/embed.js';
+                            s.setAttribute('data-timestamp', +new Date());
+                            (d.head || d.body).appendChild(s);
+                        })();
+                    </script>
+                </section>
+            
+
+        </article>
+
+    </div>
+</main>
+
+<!-- Links to Previous/Next posts -->
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+            
+                
+                
+                
+                
+            
+
+            <!-- If there's a next post, display it using the same markup included from - partials/post-card.hbs -->
+            
+
+            <!-- If there's a previous post, display it using the same markup included from - partials/post-card.hbs -->
+            
+
+        </div>
+    </div>
+</aside>
+
+<!-- Floating header which appears on-scroll, included from includes/floating-header.hbs -->
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="http://localhost:4000/">
+            
+                <img src="/assets/images/favicon.png" alt="팀 투데잇 기술블로그 icon" />
+            
+            <span>팀 투데잇 기술블로그</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">&mdash;</span>
+    <div class="floating-header-title">하루만에 서버리스 온디맨드 이미지 리사이징 서비스 구축하기</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
+</svg>
+</div>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=%ED%95%98%EB%A3%A8%EB%A7%8C%EC%97%90+%EC%84%9C%EB%B2%84%EB%A6%AC%EC%8A%A4+%EC%98%A8%EB%94%94%EB%A7%A8%EB%93%9C+%EC%9D%B4%EB%AF%B8%EC%A7%80+%EB%A6%AC%EC%82%AC%EC%9D%B4%EC%A7%95+%EC%84%9C%EB%B9%84%EC%8A%A4+%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0&amp;url=https://todait.github.io/image-resizing-service"
+            onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://todait.github.io/image-resizing-service"
+            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+
+        </a>
+    </div>
+    <progress class="progress" value="0">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+
+
+<!-- /post -->
+
+<!-- The #contentFor helper here will send everything inside it up to the matching #block helper found in default.hbs -->
+
+
+        <!-- Previous/next page links - displayed on every page -->
+        
+
+        <!-- The footer at the very bottom of the screen -->
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="http://localhost:4000/">팀 투데잇 기술블로그</a> &copy; 2018</section>
+                <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> &
+                    <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a> using
+                    <a href="https://github.com/jekyller/jasper2" target="_blank" rel="noopener">Jasper2</a></section>
+                <nav class="site-footer-nav">
+                    <a href="/">Latest Posts</a>
+                    <a href="https://facebook.com/todaitmaker" target="_blank" rel="noopener">Facebook</a>
+                    <a href="https://twitter.com/todait_" target="_blank" rel="noopener">Twitter</a>
+                    <a href="https://ghost.org" target="_blank" rel="noopener">Ghost</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.10.0/components/prism-abap.min.js"></script>
+    <script>$(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });</script>
+
+    <!-- jQuery + Fitvids, which makes all video embeds responsive -->
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="https://demo.ghost.io/assets/js/jquery.fitvids.js?v=724281a32e"></script>
+
+
+    <!-- Paginator increased to "infinit" in _config.yml -->
+    <!-- if paginator.posts  -->
+    <!-- <script>
+        var maxPages = parseInt('');
+    </script>
+    <script src="/assets/js/infinitescroll.js"></script> -->
+    <!-- /endif -->
+
+    
+
+
+    <!-- Add Google Analytics  -->
+    <!-- Google Analytics Tracking code -->
+ <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57213357-13', 'auto');
+  ga('send', 'pageview');
+
+ </script>
+
+
+    <!-- The #block helper will pull in data from the #contentFor other template files. In this case, there's some JavaScript which we only want to use in post.hbs, but it needs to be included down here, after jQuery has already loaded. -->
+    
+        <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script>
+
+    
+
+    <!-- Ghost outputs important scripts and data with this tag - it should always be the very last thing before the closing body tag -->
+    <!-- ghost_foot -->
+
+</body>
+</html>
