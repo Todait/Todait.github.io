@@ -4,7 +4,7 @@
     <title> - Articles</title>
     <description>기술, 그리고 팀 투데잇의 모든 것을 공유하는 팀블로그 입니다.</description>
     <link>
-    http://localhost:4000</link>
+    /</link>
     
       
       <item>
@@ -20,8 +20,8 @@ Flask 어플리케이션 구현부터 모바일 어플리케이션에서 사용 
         
         <pubDate>Tue, 22 May 2018 10:00:00 +0000</pubDate>
         <link>
-        http://localhost:4000/image-resizing-service</link>
-        <guid isPermaLink="true">http://localhost:4000/image-resizing-service</guid>
+        //image-resizing-service</link>
+        <guid isPermaLink="true">//image-resizing-service</guid>
       </item>
       
     
